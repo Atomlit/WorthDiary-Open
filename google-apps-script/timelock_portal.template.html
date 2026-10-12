@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{OWNER_NAME}} - Emergency Vault Portal</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: 
+        radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 100% 100%, rgba(229, 193, 88, 0.08) 0%, transparent 50%),
+        linear-gradient(to right, rgba(226, 199, 153, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(226, 199, 153, 0.035) 1px, transparent 1px),
+        #07090e;
+      background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px, 100% 100%;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .card {
+      width: 100%;
+      max-width: 31.5rem;
+      background: #0d111a;
+      border: 1px solid rgba(226, 199, 153, 0.18);
+      border-radius: 1.15rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 24px rgba(229, 193, 88, 0.08);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    .header {
+      background: linear-gradient(135deg, rgba(26, 21, 53, 0.75) 0%, rgba(13, 17, 26, 0.95) 100%);
+      padding: 1.15rem 1.35rem 0.95rem;
+      border-bottom: 1px solid rgba(226, 199, 153, 0.14);
+      text-align: center;
+      position: relative;
+    }
+    .brand-crest {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.65rem;
+      background: rgba(243, 207, 101, 0.12);
+      border: 1px solid rgba(243, 207, 101, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.45rem;
+      color: #f3cf65;
+      box-shadow: 0 3px 12px rgba(229, 193, 88, 0.2);
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.18rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.45rem;
+    }
+    .badge-locked {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .badge-unlocked {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .badge-deactivated {
+      background: rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+    body.is-locked #section-unlocked,
+    body.is-locked #section-deactivated,
+    body.is-locked .badge-unlocked,
+    body.is-locked .badge-deactivated {
+      display: none !important;
+    }
+    body.is-unlocked #section-locked,
+    body.is-unlocked #section-deactivated,
+    body.is-unlocked .badge-locked,
+    body.is-unlocked .badge-deactivated {
+      display: none !important;
+    }
+    body.is-deactivated #section-locked,
+    body.is-deactivated #section-unlocked,
+    body.is-deactivated .badge-locked,
+    body.is-deactivated .badge-unlocked {
+      display: none !important;
+    }
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fef08a 0%, #f3cf65 50%, #c59b27 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    .header p {
+      font-size: 0.775rem;
+      color: #94a3b8;
+      margin-top: 0.2rem;
+    }
+    .body {
+      padding: 1rem 1.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .meta-box {
+      background: #07090e;
+      border: 1px solid rgba(226, 199, 153, 0.14);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .meta-label {
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .meta-value {
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 0.76rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      text-align: right;
+      word-break: break-word;
+    }
+    .meta-value-brand {
+      color: #f3cf65;
+      font-weight: 700;
+    }
+    .countdown-container {
+      background: rgba(13, 17, 26, 0.75);
+      border: 1px solid rgba(226, 199, 153, 0.22);
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+      text-align: center;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .countdown-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+    }
+    .timer-unit {
+      background: rgba(24, 30, 44, 0.85);
+      border: 1px solid rgba(226, 199, 153, 0.12);
+      border-radius: 0.55rem;
+      padding: 0.45rem 0.2rem;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+    .timer-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fef08a;
+      text-shadow: 0 0 10px rgba(243, 207, 101, 0.35);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.1;
+    }
+    .timer-lbl {
+      font-size: 0.58rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-top: 0.15rem;
+    }
+    .password-box {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.35) 0%, rgba(2, 44, 34, 0.55) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 0.85rem;
+      padding: 0.95rem 1.15rem;
+      text-align: center;
+      box-shadow: 0 8px 20px -5px rgba(5, 150, 105, 0.15);
+    }
+    .password-box-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #a7f3d0;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .password-val {
+      font-size: 1.2rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 800;
+      color: #6ee7b7;
+      letter-spacing: 0.05em;
+      word-break: break-all;
+      padding: 0.6rem 0.85rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 0.55rem;
+      margin: 0.6rem 0;
+      user-select: all;
+    }
+    .btn-copy {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.4rem;
+      background: linear-gradient(135deg, #fef08a 0%, #e5c158 50%, #c59b27 100%);
+      color: #07090e;
+      font-size: 0.78rem;
+      font-weight: 800;
+      border-radius: 0.55rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(229, 193, 88, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-copy:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(229, 193, 88, 0.5);
+    }
+    .btn-copy:active {
+      transform: translateY(0);
+    }
+    .unlock-notice {
+      margin-top: 0.75rem;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(180, 83, 9, 0.25) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+      50% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.45); }
+    }
+    .unlock-notice-title {
+      font-size: 0.875rem;
+      font-weight: 800;
+      color: #fef08a;
+      letter-spacing: 0.03em;
+    }
+    .unlock-notice-text {
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      margin: 0.25rem 0 0.65rem 0;
+      line-height: 1.4;
+    }
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.35rem;
+      background: linear-gradient(135deg, #fef08a 0%, #e5c158 50%, #c59b27 100%);
+      color: #07090e;
+      font-size: 0.78rem;
+      font-weight: 800;
+      border-radius: 0.55rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(229, 193, 88, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-refresh:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(229, 193, 88, 0.5);
+    }
+    .btn-refresh:active {
+      transform: translateY(0);
+    }
+    .btn-refresh-manual {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.68rem;
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.1rem 0.25rem;
+      text-decoration: underline;
+      transition: color 0.15s;
+    }
+    .btn-refresh-manual:hover {
+      color: #f3cf65;
+    }
+    .warning-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 0.65rem;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.72rem;
+      color: #fde68a;
+      line-height: 1.4;
+    }
+    .warning-box code {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      color: #fef08a;
+      background: rgba(0,0,0,0.3);
+      padding: 0.08rem 0.3rem;
+      border-radius: 0.25rem;
+      font-weight: 700;
+    }
+    .footer {
+      padding: 0.7rem 1.35rem;
+      background: #07090e;
+      border-top: 1px solid rgba(226, 199, 153, 0.14);
+      text-align: center;
+      font-size: 0.68rem;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: center;
+    }
+    .footer a {
+      color: #f3cf65;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.15s;
+    }
+    .footer a:hover {
+      color: #fef08a;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="{{STATE_CLASS}}">
+  <div class="card">
+    <div class="header">
+      <div class="brand-crest">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 8v4"/>
+          <path d="M12 16h.01"/>
+        </svg>
+      </div>
+      <div class="header-badge badge-unlocked">● Vault Unlocked</div>
+      <div class="header-badge badge-locked">● Time-Lock Active</div>
+      <div class="header-badge badge-deactivated">● Vault Paused</div>
+      <h1>{{OWNER_NAME}}’s Emergency Vault</h1>
+      <p>Decentralized PDF Password Release & Autonomous Safe</p>
+    </div>
+    <div class="body">
+      <div class="meta-box">
+        <div class="meta-row"><span class="meta-label">Vault Owner</span><span class="meta-value">{{OWNER_NAME}}</span></div>
+        <div class="meta-row"><span class="meta-label">Vault File ID</span><span class="meta-value meta-value-brand">{{VAULT_FILE_ID}}</span></div>
+        <div class="meta-row"><span class="meta-label">PDF Created (UTC)</span><span class="meta-value">{{CREATED_DATE_FORMATTED}}</span></div>
+        <div class="meta-row"><span class="meta-label">Unlock Date (UTC)</span><span class="meta-value">{{REVEAL_DATE_FORMATTED}}</span></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: -0.2rem; margin-bottom: 0.1rem;">
+        <button class="btn-refresh-manual" onclick="checkOrRefresh(true)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 2px;">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+          </svg>
+          Refresh Portal Status
+        </button>
+      </div>
+
+      <!-- Deactivated Section -->
+      <div id="section-deactivated">
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 0.85rem; padding: 1.25rem 1rem; text-align: center;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">Vault Currently Paused</div>
+          <p style="font-size: 0.775rem; color: #64748b; line-height: 1.45;">The vault owner has temporarily paused or wiped all active time-lock countdowns. No decryption key is currently scheduled for release.</p>
+        </div>
+      </div>
+
+      <!-- Unlocked Password Section -->
+      <div id="section-unlocked">
+        <div class="password-box">
+          <div class="password-box-title">VAULT PDF PASSWORD</div>
+          <div class="password-val" id="pwd-text">{{PASSWORD}}</div>
+          <button class="btn-copy" onclick="copyPassword()">Copy PDF Password</button>
+          <div id="copy-msg" style="display:none; font-size:0.75rem; color:#34d399; margin-top:0.45rem; font-weight:600;">✓ Copied to clipboard!</div>
+        </div>
+        <div class="warning-box" style="margin-top: 0.75rem;">
+          <strong>Important:</strong> Enter this password in your PDF reader to decrypt the Emergency Vault PDF matching File ID: <code>{{VAULT_FILE_ID}}</code>.
+        </div>
+      </div>
+
+      <!-- Locked Countdown Section -->
+      <div id="section-locked">
+        <div class="countdown-container">
+          <div class="countdown-title">Time Remaining Until PDF Password Release</div>
+          <div class="countdown-grid">
+            <div class="timer-unit"><div class="timer-num" id="t-days">--</div><div class="timer-lbl">Days</div></div>
+            <div class="timer-unit"><div class="timer-num" id="t-hours">--</div><div class="timer-lbl">Hours</div></div>
+            <div class="timer-unit"><div class="timer-num" id="t-mins">--</div><div class="timer-lbl">Mins</div></div>
+            <div class="timer-unit"><div class="timer-num" id="t-secs">--</div><div class="timer-lbl">Secs</div></div>
+          </div>
+        </div>
+
+        <div id="unlock-notice" class="unlock-notice" style="display:none;">
+          <div class="unlock-notice-title">Time-Lock Countdown Elapsed</div>
+          <div class="unlock-notice-text">The release schedule has been reached. Click below to retrieve your PDF password:</div>
+          <button id="btn-refresh-main" class="btn-refresh" onclick="checkOrRefresh(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+            </svg>
+            Retrieve PDF Password
+          </button>
+        </div>
+
+        <div class="warning-box" style="margin-top: 0.75rem;">
+          <strong>Heartbeat Active:</strong> The vault owner periodically checks in. If check-ins cease, the password will automatically become available once the countdown reaches zero.
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.35rem;">
+        <span>TimeLock Portal <strong style="color: #f3cf65;">v{{VERSION}}</strong></span>
+        <span>Hosted in personal Google Account • Powered by <a href="https://worthdiary.com" target="_blank" rel="noopener">Worth Diary</a></span>
+      </div>
+      <div style="font-size: 0.625rem; color: #475569; margin-top: 0.15rem;">Private offline-first emergency vault • <a href="https://worthdiary.com" target="_blank" rel="noopener" style="color: #64748b;">worthdiary.com</a></div>
+    </div>
+  </div>
+
+  <script>
+    function showCopyMsg() {
+      var msg = document.getElementById("copy-msg");
+      if (msg) {
+        msg.style.display = "block";
+        setTimeout(function() { msg.style.display = "none"; }, 2500);
+      }
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        showCopyMsg();
+      } catch (e) {
+        console.warn("Copy failed", e);
+      }
+    }
+
+    function copyPassword() {
+      var text = document.getElementById("pwd-text") ? document.getElementById("pwd-text").innerText.trim() : "";
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          showCopyMsg();
+        }).catch(function() {
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function revealPasswordDirectly(pwd) {
+      var pwdEl = document.getElementById("pwd-text");
+      if (pwdEl) pwdEl.innerText = pwd;
+      document.body.classList.remove("is-locked");
+      document.body.classList.add("is-unlocked");
+      var notice = document.getElementById("unlock-notice");
+      if (notice) notice.style.display = "none";
+    }
+
+    function checkOrRefresh(isManual) {
+      var btn = document.getElementById("btn-refresh-main");
+      if (btn && isManual) {
+        btn.innerText = "Checking...";
+        btn.disabled = true;
+      }
+
+      function resetBtn() {
+        if (btn) {
+          btn.innerText = "Retrieve PDF Password";
+          btn.disabled = false;
+        }
+      }
+
+      // 1. Primary Native Channel: Google Apps Script RPC Bridge
+      if (typeof google !== "undefined" && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(data) {
+            resetBtn();
+            if (data && data.unlocked && data.password) {
+              revealPasswordDirectly(data.password);
+            }
+          })
+          .withFailureHandler(function(err) {
+            resetBtn();
+            console.warn("Apps Script RPC check notice:", err);
+          })
+          .getVaultStatusJson();
+        return;
+      }
+
+      // 2. Fallback for standalone preview/testing outside Google Apps Script iframe
+      try {
+        var currentUrl = window.location.href;
+        var sep = currentUrl.indexOf("?") > -1 ? "&" : "?";
+        var jsonUrl = currentUrl + sep + "format=json&_ts=" + new Date().getTime();
+
+        fetch(jsonUrl, { cache: "no-store" })
+          .then(function(res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function(data) {
+            resetBtn();
+            if (data && data.unlocked && data.password) {
+              revealPasswordDirectly(data.password);
+            }
+          })
+          .catch(function(err) {
+            resetBtn();
+            console.warn("Status check notice:", err);
+          });
+      } catch (e) {
+        resetBtn();
+      }
+    }
+
+    var isUnlocked = document.body.classList.contains("is-unlocked");
+    var targetDateStr = "{{REVEAL_DATE_ISO}}";
+
+    if (!isUnlocked && targetDateStr && document.getElementById("t-days")) {
+      var target = new Date(targetDateStr).getTime();
+      var hasChecked = false;
+
+      function updateTimer() {
+        var now = new Date().getTime();
+        var diff = target - now;
+        if (diff <= 0) {
+          if (document.getElementById("t-days")) document.getElementById("t-days").innerText = "0";
+          if (document.getElementById("t-hours")) document.getElementById("t-hours").innerText = "00";
+          if (document.getElementById("t-mins")) document.getElementById("t-mins").innerText = "00";
+          if (document.getElementById("t-secs")) document.getElementById("t-secs").innerText = "00";
+          
+          var notice = document.getElementById("unlock-notice");
+          if (notice) notice.style.display = "block";
+
+          if (!hasChecked) {
+            hasChecked = true;
+            // Silently fetch password via google.script.run RPC without reload
+            checkOrRefresh(false);
+          }
+          return;
+        }
+        var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        var secs = Math.floor((diff % (1000 * 60)) / 1000);
+        if (document.getElementById("t-days")) document.getElementById("t-days").innerText = days;
+        if (document.getElementById("t-hours")) document.getElementById("t-hours").innerText = (hours < 10 ? "0" : "") + hours;
+        if (document.getElementById("t-mins")) document.getElementById("t-mins").innerText = (mins < 10 ? "0" : "") + mins;
+        if (document.getElementById("t-secs")) document.getElementById("t-secs").innerText = (secs < 10 ? "0" : "") + secs;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+  </script>
+</body>
+</html>

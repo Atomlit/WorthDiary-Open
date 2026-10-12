@@ -1,0 +1,27 @@
+{
+  "name": "@atomlit/worthdiary-open",
+  "version": "1.0.0",
+  "description": "Open-source reference implementations, autonomous Google Apps Script time-lock templates, and decentralized Drand timelock tools for Worth Diary.",
+  "author": "Atomlit Labs <support@worthdiary.com>",
+  "license": "MIT",
+  "homepage": "https://www.worthdiary.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atomlit/worthdiary-open"
+  },
+  "keywords": [
+    "worthdiary",
+    "personal-finance",
+    "net-worth-tracker",
+    "emergency-vault",
+    "dead-mans-switch",
+    "google-apps-script",
+    "drand",
+    "timelock",
+    "zero-knowledge",
+    "privacy-first"
+  ],
+  "workspaces": [
+    "drand-timelock"
+  ]
+}
