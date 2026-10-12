@@ -2,7 +2,7 @@
   "name": "@atomlit/worthdiary-open",
   "version": "1.0.0",
   "description": "Open-source reference implementations, autonomous Google Apps Script time-lock templates, and decentralized Drand timelock tools for Worth Diary.",
-  "author": "Atomlit Labs <support@worthdiary.com>",
+  "author": "Atomlit Labs",
   "license": "MIT",
   "homepage": "https://www.worthdiary.com",
   "repository": {

@@ -81,7 +81,7 @@ Located in [`docs/`](./docs/):
 - **Official Website**: [https://www.worthdiary.com](https://www.worthdiary.com)
 - **Live Production App**: [https://app.worthdiary.com](https://app.worthdiary.com)
 - **Reddit Community**: [r/WorthDiary](https://www.reddit.com/r/WorthDiary)
-- **Support & Inquiries**: [support@worthdiary.com](mailto:support@worthdiary.com)
+- **Support & Inquiries**: [worthdiary.com/contact](https://www.worthdiary.com/contact/)
 - **Developer & Publisher**: Atomlit Labs
 
 ---
